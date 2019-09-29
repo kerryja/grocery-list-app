@@ -5,18 +5,23 @@
   "main": "server.js",
   "scripts": {
     "test": "set NODE_ENV=test&& jasmine",
-    "start": "nodemon server.js"
+    "start": "node server.js"
   },
   "author": "Kerry Jackson",
   "license": "ISC",
   "dependencies": {
+    "bootstrap": "^4.3.1",
     "express": "^4.17.1",
     "jasmine": "^3.5.0",
+    "jquery": "^3.4.1",
     "mongodb": "^3.3.2",
     "mongoose": "^5.7.1",
     "next": "^9.0.6",
+    "popper.js": "^1.15.0",
     "react": "^16.9.0",
+    "react-contenteditable": "^3.3.2",
     "react-dom": "^16.9.0",
+    "reactstrap": "^8.0.1",
     "request": "^2.88.0",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0"

@@ -2,6 +2,7 @@ const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const next = require("next");
+
 // const mongo = require("mongodb");
 // const mongoose = require("mongoose");
 // const db = mongoose.connection;
@@ -52,6 +53,20 @@ io.on("connection", socket => {
     console.log(itemID);
     global.gItems = global.gItems.filter(item => item.id !== itemID);
     socket.broadcast.emit("delete", itemID);
+  });
+
+  socket.on("checked", checkedItem => {
+    global.gItems = global.gItems.map(item =>
+      item.id === checkedItem.id ? checkedItem : item
+    );
+    socket.broadcast.emit("checked", checkedItem);
+  });
+
+  socket.on("updated", updatedItem => {
+    global.gItems = global.gItems.map(item =>
+      item.id === updatedItem.id ? updatedItem : item
+    );
+    socket.broadcast.emit("updated", updatedItem);
   });
   // setTimeout(function() {
   //   // To add to the "database"
