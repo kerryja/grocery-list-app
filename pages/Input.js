@@ -5,8 +5,7 @@ export default function Input(props) {
 
   const handleSubmit = e => {
     e.preventDefault();
-    const newItem = { name: value, checked: false, id: Date.now() };
-    console.log(newItem);
+    const newItem = { name: value, checked: false };
     props.socket.emit("item", newItem);
     setValue("");
   };

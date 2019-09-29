@@ -3,6 +3,7 @@ import ContentEditable from "react-contenteditable";
 
 export default function List(props) {
   const [items, setItems] = useState(props.items);
+  const socket = props.socket;
 
   //refactor code below
 
@@ -59,7 +60,6 @@ export default function List(props) {
 
   const handleUpdate = (e, updatedItem) => {
     updatedItem.name = e.target.value;
-    console.log(updatedItem);
     setItems(
       items.map(item => (item.id === updatedItem.id ? updatedItem : item))
     );

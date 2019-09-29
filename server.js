@@ -3,9 +3,10 @@ const http = require("http");
 const socketIO = require("socket.io");
 const next = require("next");
 
-// const mongo = require("mongodb");
-// const mongoose = require("mongoose");
-// const db = mongoose.connection;
+const mongo = require("mongodb");
+const mongoose = require("mongoose");
+const db = mongoose.connection;
+
 const app = express();
 const server = http.Server(app);
 
@@ -17,95 +18,72 @@ const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const nextHandler = nextApp.getRequestHandler();
 
-//fake db
-global.gItems = [];
-
-// app.get("/", (req, res) => res.send("Hello"));
-
 //Connect to mongo
-// async function connect() {
-//   try {
-//     await mongoose.connect("mongodb://127.0.0.1/grocery-app", {
-//       useNewUrlParser: true
-//     });
-//   } catch (error) {
-//     handleError(error);
-//     console.log(error);
-//   }
-// }
+async function connectToMongo() {
+  try {
+    await mongoose.connect("mongodb://127.0.0.1/grocery-app", {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+  } catch (error) {
+    handleError(error);
+    console.log(error);
+  }
+}
 
-// db.once("open", () => {
-//   console.log("MongoDB connected");
-// });
+db.once("open", () => {
+  console.log("MongoDB connected");
+});
 
-//connect to socket.io
-// io.on("connection", socket => {
-//   console.log("New client connected");
-//   let listItems = db.collection("list-items");
+const itemSchema = new mongoose.Schema({
+  name: String,
+  checked: Boolean
+});
+
+const itemModel = mongoose.model("Item", itemSchema);
 
 io.on("connection", socket => {
   socket.on("item", data => {
-    global.gItems.push(data);
+    itemModel.create(data);
+    socket.emit("item", data);
     socket.broadcast.emit("item", data);
   });
 
   socket.on("delete", itemID => {
+    // global.gItems = global.gItems.filter(item => item.id !== itemID);
+    //challenge: figuring out how to delete one item. DeleteOne and passing in {_id: itemID} does not work - have to use findByIdAndRemove - not easy to find in docs
+    //.exec makes sure it executes
     console.log(itemID);
-    global.gItems = global.gItems.filter(item => item.id !== itemID);
+    itemModel.findByIdAndRemove(itemID).exec();
     socket.broadcast.emit("delete", itemID);
   });
 
   socket.on("checked", checkedItem => {
-    global.gItems = global.gItems.map(item =>
-      item.id === checkedItem.id ? checkedItem : item
-    );
+    itemModel.update(checkedItem).exec();
     socket.broadcast.emit("checked", checkedItem);
   });
 
   socket.on("updated", updatedItem => {
-    global.gItems = global.gItems.map(item =>
-      item.id === updatedItem.id ? updatedItem : item
-    );
+    itemModel.update(updatedItem).exec();
     socket.broadcast.emit("updated", updatedItem);
   });
-  // setTimeout(function() {
-  //   // To add to the "database"
-  //   //global.gItems.push("From socket.io");
-  //   socket.emit("item", "From socket.io");
-  // }, 3000);
 });
 
-nextApp.prepare().then(() => {
-  // app.get("/items", (req, res) => {
-  //   res.json(items);
-  // });
+(async function() {
+  //1.connect to Mongo 2. nextjs 3. launch server
+  await connectToMongo();
+  await nextApp.prepare();
 
   app.get("*", (req, res) => {
+    req.itemModel = itemModel;
     return nextHandler(req, res);
   });
-
-  //send status
-  // sendStatus = s => {
-  //   socket.emit("status", s);
-  // };
-
-  //get list items from mongo collection
-  // socket.on("list-item", data => {
-  //   let listItems = db.collection("list-items");
-  //   io.sockets.emit("list-item", data);
-  // });
-
-  // listItems.find()
-  // });
-  // });
-
-  // app.use(express.static("public"));
 
   server.listen(port, err => {
     if (err) throw err;
     console.log(`Ready on ${port}`);
   });
-});
+})();
 
 function normalizePort(val) {
   const port = parseInt(val, 10);

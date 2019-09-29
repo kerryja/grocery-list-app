@@ -10,7 +10,7 @@ export default function App(props) {
   return (
     <main>
       <h1>Grocery App</h1>
-      <List items={props.items} />
+      <List items={props.items} socket={socket} />
       <Input socket={socket} />
     </main>
   );
@@ -18,5 +18,12 @@ export default function App(props) {
 
 //fetch old list items from server
 App.getInitialProps = async ({ req }) => {
-  return { items: global.gItems };
+  const itemModel = req.itemModel;
+  //challenge: trying to return all items vs just one
+  let dbItems = await itemModel.find();
+  return {
+    items: dbItems.map(i => {
+      return { id: i.id, name: i.name, checked: i.checked };
+    })
+  };
 };
