@@ -1,7 +1,7 @@
 import React from "react";
-import Navbar from "./Navbar";
-import List from "./List";
-import Input from "./Input";
+import Navbar from "../components/Navbar";
+import List from "../components/List";
+import Input from "../components/Input";
 import io from "socket.io-client";
 
 //establishing one-time connection

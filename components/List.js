@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ContentEditable from "react-contenteditable";
 
 export default function List(props) {
-  const [items, setItems] = useState(props.items);
+  const [items, setItems] = useState(props.items || []);
   const socket = props.socket;
 
   //refactor code below

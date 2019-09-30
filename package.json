@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test": "set NODE_ENV=test && jasmine \"spec/unit/*spec.js\" && jasmine \"spec/integration/*spec.js\"",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "next build",
+    "heroku-postbuild": "npm run build"
   },
   "author": "Kerry Jackson",
   "license": "ISC",
