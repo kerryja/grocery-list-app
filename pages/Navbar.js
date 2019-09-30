@@ -4,28 +4,28 @@ export default function Navbar(props) {
   const getUserSignIn = user => {
     if (user) {
       return (
-        <li>
-          Signed in with {user.emails[0].value}.{" "}
-          <a href="/auth/google/signout">Sign Out</a>
-        </li>
+        <nav>
+          <li>
+            Signed in with {user.emails[0].value}.{" "}
+            <a href="/auth/google/signout">Sign Out</a>
+          </li>
+        </nav>
       );
     }
     return (
-      <li>
-        <a href="/auth/google">Sign In with Google</a>
-      </li>
+      <nav>
+        <li>
+          <a href="/auth/google">Sign In with Google</a>
+        </li>
+      </nav>
     );
   };
 
   return (
-    //fix this
-    <div>
-      <ul>
-        <li>
-          <a href="/">Home</a>
-        </li>
-        {getUserSignIn(props.user)}
-      </ul>
-    </div>
+    <nav>
+      <div>
+        <ul>{getUserSignIn(props.user)}</ul>
+      </div>
+    </nav>
   );
 }

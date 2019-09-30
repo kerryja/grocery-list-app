@@ -15,12 +15,20 @@ export default function Input(props) {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
+          className="text"
           name="text"
           value={value}
           onChange={e => setValue(e.target.value)}
         />
         <button type="submit">Add</button>
       </form>
+      <style jsx global>
+        {`
+          form {
+            text-align: center;
+          }
+        `}
+      </style>
     </div>
   );
 }

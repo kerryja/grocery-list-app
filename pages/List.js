@@ -67,7 +67,7 @@ export default function List(props) {
   };
 
   return (
-    <div className="container">
+    <div className="container" id="grocery-list-container">
       <ul>
         {items.map(item => (
           <li key={item.id}>
@@ -78,6 +78,7 @@ export default function List(props) {
               onChange={e => handleChecked(item)}
             />
             <ContentEditable
+              className="name"
               html={item.name}
               onChange={e => handleUpdate(e, item)}
             />
@@ -85,19 +86,53 @@ export default function List(props) {
           </li>
         ))}
       </ul>
-      <style jsx>{`
-         {
-          input[type="checkbox"]:checked + label {
-            text-decoration: line-through;
-          }
-          h1 {
-            text-align: center;
-          }
+      <style jsx global>{`
+        input[type="checkbox"]:checked + div.name {
+          text-decoration: line-through;
         }
+
+        input[type="checkbox"] {
+          display: inline-block;
+        }
+
+        .name {
+          display: inline-block;
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+
+        #grocery-list-container {
+          width: fit-content;
+          margin: auto;
+        }
+
+        body {
+          font-family: "Verdana", sans-serif;
+        }
+
+        a {
+          text-decoration: none;
+        }
+
+        a:hover {
+          color: orange;
+        }
+        h1 {
+          color: green;
+          text-align: center;
+        }
+
+        ul {
+          padding-left: 0;
+        }
+
         li {
-          color: blue;
           text-align: center;
           list-style-type: none;
+        }
+
+        #grocery-list-container li {
+          text-align: left;
         }
       `}</style>
     </div>
