@@ -21,9 +21,10 @@ export default function App(props) {
 //fetch old list items from server
 App.getInitialProps = async ({ req }) => {
   if (!req.user) return { items: [], user: null };
-  const itemModel = req.itemModel;
+  //because this is on the client side, you cannot import db directly. so went aroud it by passing queries from server.js to the client via req - since req is the same obj on both sides -vehicle to carry it
+  const queries = req.queries;
   //challenge: trying to return all items vs just one
-  let dbItems = await itemModel.find();
+  let dbItems = await queries.getAllGroceryItems();
   return {
     items: dbItems.map(i => {
       return { id: i.id, name: i.name, checked: i.checked };

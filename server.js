@@ -28,9 +28,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-const mongo = require("mongodb");
 const mongoose = require("mongoose");
 const db = mongoose.connection;
+const queries = require("./db/queries");
 
 const server = http.Server(app);
 
@@ -47,9 +47,15 @@ const nextHandler = nextApp.getRequestHandler();
 //Connect to mongo
 async function connectToMongo() {
   try {
-    await mongoose.connect("mongodb://127.0.0.1/grocery-app", {
+    const MONGO_DB =
+      process.env.MONGODB_URI ||
+      (process.env.NODE_ENV == "test"
+        ? "mongodb://127.0.0.1/grocery-app-test"
+        : "mongodb://127.0.0.1/grocery-app");
+    await mongoose.connect(MONGO_DB, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
+      useFindAndModify: false
     });
   } catch (error) {
     handleError(error);
@@ -60,13 +66,6 @@ async function connectToMongo() {
 db.once("open", () => {
   console.log("MongoDB connected");
 });
-
-const itemSchema = new mongoose.Schema({
-  name: String,
-  checked: Boolean
-});
-
-const itemModel = mongoose.model("Item", itemSchema);
 
 //middleware - adds a user property to socket.io. Without this, you would be able to add things to list w/out beign signed in
 io.use(
@@ -82,7 +81,8 @@ io.use(
 io.on("connection", socket => {
   socket.on("item", data => {
     if (socket.request.user && socket.request.user.logged_in) {
-      itemModel.create(data);
+      //itemModel.create(data);
+      queries.createNewGroceryItem(data);
       socket.emit("item", data);
       socket.broadcast.emit("item", data);
     }
@@ -95,21 +95,24 @@ io.on("connection", socket => {
       //challenge: figuring out how to delete one item. DeleteOne and passing in {_id: itemID} does not work - have to use findByIdAndRemove - not easy to find in docs
       //.exec makes sure it executes
       console.log(itemID);
-      itemModel.findByIdAndRemove(itemID).exec();
+      // itemModel.findByIdAndRemove(itemID).exec();
+      queries.deleteGroceryItem(itemID);
       socket.broadcast.emit("delete", itemID);
     }
   });
 
   socket.on("checked", checkedItem => {
     if (socket.request.user && socket.request.user.logged_in) {
-      itemModel.update(checkedItem).exec();
+      // itemModel.update(checkedItem).exec();
+      queries.checkOffGroceryItem(checkedItem);
       socket.broadcast.emit("checked", checkedItem);
     }
   });
 
   socket.on("updated", updatedItem => {
     if (socket.request.user && socket.request.user.logged_in) {
-      itemModel.update(updatedItem).exec();
+      // itemModel.update(updatedItem).exec();
+      queries.updateGroceryItem(updatedItem);
       socket.broadcast.emit("updated", updatedItem);
     }
   });
@@ -137,7 +140,18 @@ passport.deserializeUser(function(obj, cb) {
   cb(null, obj);
 });
 
-(async function() {
+function normalizePort(val) {
+  const port = parseInt(val, 10);
+  if (isNaN(port)) {
+    return val;
+  }
+  if (port >= 0) {
+    return port;
+  }
+  return false;
+}
+
+module.exports = (async function() {
   //1.connect to Mongo 2. nextjs 3. launch server
   await connectToMongo();
   await nextApp.prepare();
@@ -163,7 +177,7 @@ passport.deserializeUser(function(obj, cb) {
   });
 
   app.get("*", (req, res) => {
-    req.itemModel = itemModel;
+    req.queries = queries;
     return nextHandler(req, res);
   });
 
@@ -172,14 +186,3 @@ passport.deserializeUser(function(obj, cb) {
     console.log(`Ready on ${port}`);
   });
 })();
-
-function normalizePort(val) {
-  const port = parseInt(val, 10);
-  if (isNaN(port)) {
-    return val;
-  }
-  if (port >= 0) {
-    return port;
-  }
-  return false;
-}
