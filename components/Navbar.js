@@ -6,8 +6,10 @@ export default function Navbar(props) {
       return (
         <nav>
           <li>
-            Signed in with {user.emails[0].value}.{" "}
-            <a href="/auth/google/signout">Sign Out</a>
+            Signed in with <span>{user.emails[0].value}</span>{" "}
+            <a className="sign-out" href="/auth/google/signout">
+              Sign Out
+            </a>
           </li>
         </nav>
       );
@@ -26,6 +28,12 @@ export default function Navbar(props) {
       <div>
         <ul>{getUserSignIn(props.user)}</ul>
       </div>
+      <style jsx>
+        {`
+          font-weight: normal;
+          }
+        `}
+      </style>
     </nav>
   );
 }

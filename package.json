@@ -12,6 +12,7 @@
   "author": "Kerry Jackson",
   "license": "ISC",
   "dependencies": {
+    "@zeit/next-css": "^1.0.1",
     "body-parser": "^1.19.0",
     "bootstrap": "^4.3.1",
     "cookie-parser": "^1.4.4",

@@ -20,7 +20,9 @@ export default function Input(props) {
           value={value}
           onChange={e => setValue(e.target.value)}
         />
-        <button type="submit">Add</button>
+        <button type="submit" className="btn btn-success btn-circle">
+          +
+        </button>
       </form>
       <style jsx global>
         {`
