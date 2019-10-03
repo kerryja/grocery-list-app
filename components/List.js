@@ -1,68 +1,63 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useReducer } from "react";
 import ContentEditable from "react-contenteditable";
 
+function itemReducer(items, operationData) {
+  const [op, arg] = operationData;
+  switch (op) {
+    case "add":
+      return [...items, arg];
+    case "delete":
+      return items.filter(item => item.id !== arg);
+    case "check":
+      return items.map(item => (item.id === arg.id ? arg : item));
+    case "update":
+      return items.map(item => (item.id === arg.id ? arg : item));
+  }
+}
+
 export default function List(props) {
-  const [items, setItems] = useState(props.items || []);
+  const [items, dispatch] = useReducer(itemReducer, props.items);
   const socket = props.socket;
 
   //refactor code below
 
   useEffect(() => {
     //receiving from server
-    socket.on("item", newItem => {
-      console.log("new item added");
-      console.log(newItem);
-      setItems([...items, newItem]);
-    });
+    socket.on("item", newItem => dispatch(["add", newItem]));
     return () => socket.off("item");
   }, [items]);
 
   useEffect(() => {
     //receiving from server
-    socket.on("delete", itemID => {
-      const filteredItems = items.filter(item => item.id !== itemID);
-      setItems(filteredItems);
-    });
+    socket.on("delete", itemID => dispatch(["delete", itemID]));
     return () => socket.off("delete");
   }, [items]);
 
   useEffect(() => {
-    socket.on("checked", checkedItem => {
-      setItems(
-        items.map(item => (item.id === checkedItem.id ? checkedItem : item))
-      );
-    });
+    socket.on("checked", checkedItem => dispatch(["check", checkedItem]));
     return () => socket.off("checked");
   }, [items]);
 
   useEffect(() => {
-    socket.on("updated", updatedItem => {
-      setItems(
-        items.map(item => (item.id === updatedItem.id ? updatedItem : item))
-      );
-    });
+    socket.on("updated", updatedItem => dispatch(["update", updatedItem]));
     return () => socket.off("updated");
   }, [items]);
 
   const handleDelete = itemID => {
     const filteredItems = items.filter(item => item.id !== itemID);
     socket.emit("delete", itemID);
-    setItems(filteredItems);
+    dispatch(["delete", itemID]);
   };
 
   const handleChecked = checkedItem => {
     checkedItem.checked = !checkedItem.checked;
-    setItems(
-      items.map(item => (item.id === checkedItem.id ? checkedItem : item))
-    );
+    dispatch(["check", checkedItem]);
     socket.emit("checked", checkedItem);
   };
 
   const handleUpdate = (e, updatedItem) => {
     updatedItem.name = e.target.value;
-    setItems(
-      items.map(item => (item.id === updatedItem.id ? updatedItem : item))
-    );
+    dispatch(["update", updatedItem]);
     socket.emit("updated", updatedItem);
   };
 

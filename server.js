@@ -11,6 +11,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const MemoryStore = require("memorystore")(session);
 
+//google auth
 app.use(cookieParser());
 app.use(require("body-parser").urlencoded({ extended: true }));
 let memoryStore = new MemoryStore({ checkPeriod: 8640000 /* 24h */ });
@@ -41,8 +42,6 @@ const io = socketIO(server);
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const nextHandler = nextApp.getRequestHandler();
-
-//look into checked not saving in db correctly
 
 //Connect to mongo
 async function connectToMongo() {
@@ -79,10 +78,10 @@ io.use(
 );
 
 io.on("connection", socket => {
-  socket.on("item", data => {
+  socket.on("item", async data => {
     if (socket.request.user && socket.request.user.logged_in) {
-      //itemModel.create(data);
-      queries.createNewGroceryItem(data);
+      let newItem = await queries.createNewGroceryItem(data);
+      data.id = newItem.id;
       socket.emit("item", data);
       socket.broadcast.emit("item", data);
     }
@@ -94,8 +93,8 @@ io.on("connection", socket => {
       // global.gItems = global.gItems.filter(item => item.id !== itemID);
       //challenge: figuring out how to delete one item. DeleteOne and passing in {_id: itemID} does not work - have to use findByIdAndRemove - not easy to find in docs
       //.exec makes sure it executes
+      console.log("deleting this item ID");
       console.log(itemID);
-      // itemModel.findByIdAndRemove(itemID).exec();
       queries.deleteGroceryItem(itemID);
       socket.broadcast.emit("delete", itemID);
     }
@@ -103,7 +102,6 @@ io.on("connection", socket => {
 
   socket.on("checked", checkedItem => {
     if (socket.request.user && socket.request.user.logged_in) {
-      // itemModel.update(checkedItem).exec();
       queries.checkOffGroceryItem(checkedItem);
       socket.broadcast.emit("checked", checkedItem);
     }
@@ -111,7 +109,6 @@ io.on("connection", socket => {
 
   socket.on("updated", updatedItem => {
     if (socket.request.user && socket.request.user.logged_in) {
-      // itemModel.update(updatedItem).exec();
       queries.updateGroceryItem(updatedItem);
       socket.broadcast.emit("updated", updatedItem);
     }
@@ -135,6 +132,7 @@ passport.use(
   )
 );
 
+//needed for remembering who is connected/how
 passport.serializeUser(function(user, cb) {
   cb(null, user);
 });
