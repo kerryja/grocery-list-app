@@ -160,7 +160,7 @@ module.exports = (async function() {
   app.get(
     "/auth/google",
     passport.authenticate("google", {
-      scope: "openid email"
+      scope: "openid profile"
     })
   );
 

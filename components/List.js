@@ -152,13 +152,9 @@ export default function List(props) {
           color: orange;
           text-decoration: none;
         }
-        h1 {
-          color: blue;
-          text-align: center;
-        }
 
         span {
-          color: blue;
+          color: dodgerBlue;
         }
 
         ul {

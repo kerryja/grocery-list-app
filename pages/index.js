@@ -42,18 +42,17 @@ export default function App(props) {
         <style jsx global>
           {`
             h1 {
+              color: dodgerBlue;
+              text-align: center;
               font-size: 55px;
             }
 
-            img {
-            }
-
-            p {
+            .icons {
               padding-top: 10px;
               padding-bottom: 10px;
             }
 
-            p img {
+            .icons img {
               padding: 5px;
               max-width: 50px;
             }

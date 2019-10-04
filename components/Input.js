@@ -20,7 +20,7 @@ export default function Input(props) {
           value={value}
           onChange={e => setValue(e.target.value)}
         />
-        <button type="submit" className="btn btn-success btn-circle">
+        <button type="submit" className="btn">
           +
         </button>
       </form>
@@ -28,6 +28,35 @@ export default function Input(props) {
         {`
           form {
             text-align: center;
+          }
+
+          .btn {
+            background-color: #6cf5c5;
+          }
+
+          .btn:hover {
+            background-color: #ffd553;
+          }
+
+          .btn-sm {
+            background-color: #ff6376;
+          }
+
+          .btn-sm:hover {
+            background-color: #ffd553;
+          }
+
+          .btn-sm:focus,
+          .btn:active:focus,
+          .btn.active:focus,
+          .btn.focus,
+          .btn:active.focus,
+          .btn.active.focus {
+            outline: none;
+          }
+
+          .btn-sm: focus {
+            outline: none;
           }
         `}
       </style>

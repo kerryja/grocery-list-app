@@ -3,13 +3,14 @@ import React from "react";
 export default function Navbar(props) {
   const getUserSignIn = user => {
     if (user) {
+      console.log(user);
       return (
         <nav>
           <li>
-            Signed in with <span>{user.emails[0].value}</span>{" "}
-            <a className="sign-out" href="/auth/google/signout">
-              Sign Out
-            </a>
+            Hello, <span>{user.name.givenName}!</span>{" "}
+            <p>
+              <a href="/auth/google/signout">Sign Out</a>
+            </p>
           </li>
         </nav>
       );
@@ -17,7 +18,7 @@ export default function Navbar(props) {
     return (
       <nav>
         <li>
-          <a href="/auth/google">Sign In with Google</a>
+          <a href="/auth/google">Sign in with Google</a>
         </li>
       </nav>
     );
@@ -32,6 +33,8 @@ export default function Navbar(props) {
         {`
           font-weight: normal;
           }
+
+       
         `}
       </style>
     </nav>
