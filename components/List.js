@@ -19,8 +19,6 @@ export default function List(props) {
   const [items, dispatch] = useReducer(itemReducer, props.items);
   const socket = props.socket;
 
-  //refactor code below
-
   useEffect(() => {
     //receiving from server
     socket.on("item", newItem => dispatch(["add", newItem]));
@@ -61,6 +59,20 @@ export default function List(props) {
     socket.emit("updated", updatedItem);
   };
 
+  const pasteAsPlainText = e => {
+    event.preventDefault();
+    const text = event.clipboardData.getData("text/plain");
+    document.execCommand("insertHTML", false, text);
+  };
+
+  const disableNewlines = e => {
+    const keyCode = event.keyCode || event.which;
+    if (keyCode === 13) {
+      event.returnValue = false;
+      if (event.preventDefault) event.preventDefault();
+    }
+  };
+
   return (
     <div className="">
       <table id="grocery-list-container">
@@ -80,6 +92,8 @@ export default function List(props) {
                   className="name"
                   html={item.name}
                   onChange={e => handleUpdate(e, item)}
+                  onPaste={e => pasteAsPlainText()}
+                  onKeyPress={e => disableNewlines()}
                 />
               </td>
 
@@ -95,35 +109,28 @@ export default function List(props) {
       </table>
 
       <style jsx global>{`
-        input[type="checkbox"]:checked + input.name {
+        input[type="checkbox"]:checked + div.name {
           text-decoration: line-through;
         }
-
         input[type="checkbox"] {
           display: inline-block;
         }
-
         [type="checkbox"]:before {
           width: 20px;
           height: 20px;
         }
-
         input[type="checkbox"]:focus {
           outline: 0;
         }
-
         input[type="text"] {
           width: 200px;
         }
-
         .grid-item {
           display: flex;
         }
-
         td {
           text-align: center;
         }
-
         #grocery-list-container {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(350, 1fr));
@@ -132,56 +139,45 @@ export default function List(props) {
           justify-content: center;
           column-gap: 30px;
         }
-
         .name {
           display: inline-block;
           padding-left: 10px;
           padding-right: 10px;
         }
-
         body {
           font-family: "Verdana", sans-serif;
         }
-
         a {
           text-decoration: none;
           color: red;
         }
-
         a:hover {
           color: orange;
           text-decoration: none;
         }
-
         span {
           color: dodgerBlue;
         }
-
         ul {
           padding-left: 0;
         }
-
         li {
           text-align: center;
           list-style-type: none;
         }
-
         .delete-item {
           color: red;
           cursor: pointer;
           font-size: 18px;
           visibility: hidden;
         }
-
         .name {
           font-size: 20px;
           font-weight: normal;
         }
-
         td {
           padding-bottom: 10px;
         }
-
         tr:hover .delete-item {
           visibility: visible;
         }
