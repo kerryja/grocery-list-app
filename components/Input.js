@@ -24,7 +24,7 @@ export default function Input(props) {
           +
         </button>
       </form>
-      <style jsx global>
+      <style jsx>
         {`
           form {
             text-align: center;

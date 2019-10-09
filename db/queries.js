@@ -14,6 +14,10 @@ module.exports = {
     return ItemModel.findByIdAndRemove(itemID).exec();
   },
 
+  clearList() {
+    return ItemModel.deleteMany().exec();
+  },
+
   checkOffGroceryItem(checkedItem) {
     return ItemModel.findByIdAndUpdate(checkedItem.id, {
       checked: checkedItem.checked

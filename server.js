@@ -90,13 +90,17 @@ io.on("connection", socket => {
   socket.on("delete", itemID => {
     //authenticating user
     if (socket.request.user && socket.request.user.logged_in) {
-      // global.gItems = global.gItems.filter(item => item.id !== itemID);
-      //challenge: figuring out how to delete one item. DeleteOne and passing in {_id: itemID} does not work - have to use findByIdAndRemove - not easy to find in docs
-      //.exec makes sure it executes
       console.log("deleting this item ID");
       console.log(itemID);
       queries.deleteGroceryItem(itemID);
-      socket.broadcast.emit("delete", itemID);
+      socket.to(socket.request.user.id).emit("delete", itemID);
+    }
+  });
+
+  socket.on("clearList", () => {
+    if (socket.request.user && socket.request.user.logged_in) {
+      queries.clearList();
+      socket.to(socket.request.user.id).emit("clearList");
     }
   });
 

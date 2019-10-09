@@ -12,6 +12,8 @@ function itemReducer(items, operationData) {
       return items.map(item => (item.id === arg.id ? arg : item));
     case "update":
       return items.map(item => (item.id === arg.id ? arg : item));
+    case "clearList":
+      return [];
   }
 }
 
@@ -32,6 +34,12 @@ export default function List(props) {
   }, [items]);
 
   useEffect(() => {
+    //receiving from server
+    socket.on("clearList", items => dispatch(["clearList", null]));
+    return () => socket.off("clearList");
+  }, [items]);
+
+  useEffect(() => {
     socket.on("checked", checkedItem => dispatch(["check", checkedItem]));
     return () => socket.off("checked");
   }, [items]);
@@ -45,6 +53,11 @@ export default function List(props) {
     const filteredItems = items.filter(item => item.id !== itemID);
     socket.emit("delete", itemID);
     dispatch(["delete", itemID]);
+  };
+
+  const clearList = () => {
+    socket.emit("clearList");
+    dispatch(["clearList", null]);
   };
 
   const handleChecked = checkedItem => {
@@ -74,7 +87,14 @@ export default function List(props) {
   };
 
   return (
-    <div className="">
+    <div>
+      <button
+        className=" btn-sm btn-outline-secondary"
+        id="clear"
+        onClick={e => clearList(items)}
+      >
+        Clear List
+      </button>
       <table id="grocery-list-container">
         {items.map(item => (
           <tr key={item.id} className="grid-item">
@@ -86,32 +106,42 @@ export default function List(props) {
                 onChange={e => handleChecked(item)}
               />
             </td>
-            <div className="content-and-delete-btn">
-              <td>
-                <ContentEditable
-                  className="name"
-                  html={item.name}
-                  onChange={e => handleUpdate(e, item)}
-                  onPaste={e => pasteAsPlainText()}
-                  onKeyPress={e => disableNewlines()}
-                />
-              </td>
+            <td>
+              <ContentEditable
+                className="name"
+                html={item.name}
+                style={{ textDecoration: item.checked ? "line-through" : "" }}
+                onChange={e => handleUpdate(e, item)}
+                onPaste={e => pasteAsPlainText()}
+                onKeyPress={e => disableNewlines()}
+              />
+            </td>
 
-              <td>
-                <i
-                  className="far fa-trash-alt delete-item"
-                  onClick={e => handleDelete(item.id)}
-                ></i>
-              </td>
-            </div>
+            <td>
+              <i
+                className="far fa-trash-alt delete-item"
+                onClick={e => handleDelete(item.id)}
+              ></i>
+            </td>
           </tr>
         ))}
       </table>
 
       <style jsx global>{`
-        input[type="checkbox"]:checked + div.name {
-          text-decoration: line-through;
+        #clear {
+          display: block;
+          margin: 0 auto;
+          background: white;
         }
+
+        #clear: focus {
+          outline: none;
+        }
+
+        .btn: hover {
+          color: orange;
+        }
+
         input[type="checkbox"] {
           display: inline-block;
         }
@@ -138,6 +168,7 @@ export default function List(props) {
           grid-auto-flow: column;
           justify-content: center;
           column-gap: 30px;
+          padding-top: 10px;
         }
         .name {
           display: inline-block;
