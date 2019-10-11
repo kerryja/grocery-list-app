@@ -43,6 +43,8 @@ const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const nextHandler = nextApp.getRequestHandler();
 
+const User = require("./db/UserModel");
+
 //Connect to mongo
 async function connectToMongo() {
   try {
@@ -78,12 +80,17 @@ io.use(
 );
 
 io.on("connection", socket => {
+  if (socket.request.user && socket.request.user.logged_in) {
+    socket.join(socket.request.user.id);
+  }
   socket.on("item", async data => {
     if (socket.request.user && socket.request.user.logged_in) {
+      data.creator = socket.request.user.id;
+      data.collaborators = [];
       let newItem = await queries.createNewGroceryItem(data);
       data.id = newItem.id;
       socket.emit("item", data);
-      socket.broadcast.emit("item", data);
+      socket.to(socket.request.user.id).emit("item", data);
     }
   });
 
@@ -107,14 +114,14 @@ io.on("connection", socket => {
   socket.on("checked", checkedItem => {
     if (socket.request.user && socket.request.user.logged_in) {
       queries.checkOffGroceryItem(checkedItem);
-      socket.broadcast.emit("checked", checkedItem);
+      socket.to(socket.request.user.id).emit("checked", checkedItem);
     }
   });
 
   socket.on("updated", updatedItem => {
     if (socket.request.user && socket.request.user.logged_in) {
       queries.updateGroceryItem(updatedItem);
-      socket.broadcast.emit("updated", updatedItem);
+      socket.to(socket.request.user.id).emit("updated", updatedItem);
     }
   });
 });
@@ -131,6 +138,26 @@ passport.use(
       callbackURL: callbackUrl
     },
     function(token, tokenSecret, profile, done) {
+      //change below to async await
+
+      //check if user already exists in db
+      User.findOne({ googleId: profile.id }).then(currentUser => {
+        if (currentUser) {
+          //already have user
+          console.log(`user is ${currentUser}`);
+        } else {
+          //if not, create new user
+          new User({
+            username: profile.displayName,
+            googleId: profile.id
+          })
+            .save()
+            .then(newUser => {
+              console.log(`new user created: ${newUser}`);
+            });
+        }
+      });
+
       return done(null, profile);
     }
   )

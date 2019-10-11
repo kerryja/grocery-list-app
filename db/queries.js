@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const ItemModel = require("./ItemModel");
 
 module.exports = {
-  getAllGroceryItems() {
-    return ItemModel.find();
+  getAllGroceryItems(id) {
+    return ItemModel.find({ creator: id });
   },
 
   createNewGroceryItem(data) {
