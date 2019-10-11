@@ -89,12 +89,14 @@ export default function List(props) {
   return (
     <div>
       <button
+        style={props.user ? {} : { display: "none" }}
         className=" btn-sm btn-outline-secondary"
         id="clear"
         onClick={e => clearList(items)}
       >
         Clear List
       </button>
+
       <table id="grocery-list-container">
         {items.map(item => (
           <tr key={item.id} className="grid-item">
@@ -110,7 +112,9 @@ export default function List(props) {
               <ContentEditable
                 className="name"
                 html={item.name}
-                style={{ textDecoration: item.checked ? "line-through" : "" }}
+                style={{
+                  textDecoration: item.checked ? "line-through" : ""
+                }}
                 onChange={e => handleUpdate(e, item)}
                 onPaste={e => pasteAsPlainText()}
                 onKeyPress={e => disableNewlines()}
@@ -126,15 +130,19 @@ export default function List(props) {
           </tr>
         ))}
       </table>
-
       <style jsx global>{`
         #clear {
           display: block;
           margin: 0 auto;
           background: white;
+          color: black;
         }
 
-        #clear: focus {
+        #clear:hover {
+          background-color: #ffd553;
+        }
+
+        #clear:focus {
           outline: none;
         }
 
@@ -164,7 +172,7 @@ export default function List(props) {
         #grocery-list-container {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(350, 1fr));
-          grid-template-rows: repeat(13, 1fr);
+          grid-template-rows: repeat(12, 1fr);
           grid-auto-flow: column;
           justify-content: center;
           column-gap: 30px;

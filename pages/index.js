@@ -12,7 +12,7 @@ export default function App(props) {
   return (
     <div>
       <Head>
-        <title>Grocery List</title>
+        <title>Groceries</title>
         <link
           rel="stylesheet"
           href="https://bootswatch.com/4/sketchy/bootstrap.min.css"
@@ -26,7 +26,7 @@ export default function App(props) {
       </Head>
       <main>
         <Navbar user={props.user} />
-        <h1>Our Grocery List</h1>
+        <h1>Groceries</h1>
         <p align="center" className="icons">
           <img src="/static/bananas.svg" />
           <img src="/static/cheese.svg" />
@@ -37,8 +37,8 @@ export default function App(props) {
           <img src="/static/cookie.svg" />
           <img src="/static/corn.svg" />
         </p>
-        <List items={props.items} socket={socket} />
-        <Input socket={socket} />
+        <List items={props.items} socket={socket} user={props.user} />
+        <Input socket={socket} user={props.user} />
         <style jsx global>
           {`
             h1 {
@@ -49,7 +49,6 @@ export default function App(props) {
 
             .icons {
               padding-top: 10px;
-              padding-bottom: 10px;
             }
 
             .icons img {

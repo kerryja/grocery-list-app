@@ -12,7 +12,10 @@ export default function Input(props) {
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form
+        style={props.user ? {} : { display: "none" }}
+        onSubmit={handleSubmit}
+      >
         <input
           type="text"
           className="text"

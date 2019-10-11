@@ -3,7 +3,6 @@ import React from "react";
 export default function Navbar(props) {
   const getUserSignIn = user => {
     if (user) {
-      console.log(user);
       return (
         <nav>
           <li>
