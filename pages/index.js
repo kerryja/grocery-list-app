@@ -68,7 +68,9 @@ App.getInitialProps = async ({ req }) => {
   //because this is on the client side, you cannot import db directly. so went aroud it by passing queries from server.js to the client via req - since req is the same obj on both sides -vehicle to carry it
   const queries = req.queries;
   //challenge: trying to return all items vs just one
-  let dbItems = await queries.getAllGroceryItems();
+  let dbItems = await queries.getAllGroceryItems(req.user.id);
+  console.log(dbItems);
+
   return {
     items: dbItems.map(i => {
       return { id: i.id, name: i.name, checked: i.checked };
