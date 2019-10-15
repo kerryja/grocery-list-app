@@ -12,7 +12,7 @@ export default function App(props) {
   return (
     <div>
       <Head>
-        <title>Groceries</title>
+        <title>StockUp</title>
         <link
           rel="stylesheet"
           href="https://bootswatch.com/4/sketchy/bootstrap.min.css"
@@ -26,7 +26,7 @@ export default function App(props) {
       </Head>
       <main>
         <Navbar user={props.user} />
-        <h1>Groceries</h1>
+        <h1>StockUp</h1>
         <p align="center" className="icons">
           <img src="/static/bananas.svg" />
           <img src="/static/cheese.svg" />
